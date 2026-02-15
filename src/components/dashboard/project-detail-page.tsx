@@ -448,7 +448,7 @@ export function ProjectDetailPage({
                     const isExpanded = expandedDep === dep.id;
 
                     return (
-                      <>
+                      <React.Fragment key={dep.id}>
                         <TableRow
                           key={dep.id}
                           className="cursor-pointer hover:bg-muted/30"
@@ -576,7 +576,7 @@ export function ProjectDetailPage({
                             </TableCell>
                           </TableRow>
                         )}
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </TableBody>
