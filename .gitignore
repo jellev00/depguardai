@@ -1,3 +1,30 @@
+### Universal ###
+# Common files that should be ignored in all projects
+
+# Logs
+*.log
+# Temporary files
+*.tmp
+*~
+
+*.bak
+# Environment files (containing secrets, API keys, credentials)
+.env
+*.env
+.env.*
+
+# Local configuration that shouldn't be shared
+*.local
+
+### Next_js ###
+# next_js specific files
+
+.next/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # v0 runtime files (should only exist in preview, not in git)
 __v0_runtime_loader.js
 __v0_devtools.tsx
