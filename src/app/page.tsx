@@ -52,8 +52,20 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-        <div className="mx-auto max-w-2xl text-center">
+      <main 
+        className="flex flex-1 flex-col items-center justify-center px-6 py-16 relative"
+        style={{
+          backgroundImage: 'url("/DepGuardAI_Logo.gif")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay voor blur effect */}
+        <div className="absolute inset-0 backdrop-blur-sm bg-white/95" />
+        
+        {/* Content met relative positioning om boven overlay te komen */}
+        <div className="relative z-10 mx-auto max-w-2xl text-center">
           <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Dependency intelligence for modern teams
           </h1>
@@ -71,7 +83,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-20 grid max-w-3xl gap-8 sm:grid-cols-3">
+        <div className="relative z-10 mx-auto mt-20 grid max-w-3xl gap-8 sm:grid-cols-3">
           {[
             {
               icon: GitBranch,
