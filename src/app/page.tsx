@@ -9,6 +9,7 @@ import {
   GitBranch,
   Sparkles,
 } from "lucide-react";
+import Image from 'next/image';
 
 export default async function HomePage() {
   let isLoggedIn = false;
@@ -31,8 +32,13 @@ export default async function HomePage() {
     <div className="flex min-h-svh flex-col">
       <header className="flex h-14 items-center justify-between border-b px-6">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Package className="h-4 w-4 text-primary-foreground" />
+          <div className="flex w-12 items-center justify-center rounded-lg">
+                <Image
+                  src="/DepGuardAI_Logo.png"
+                  width={1000}
+                  height={1000}
+                  alt="DepGuard AI Logo"
+                />
           </div>
           <span className="font-semibold text-foreground">DepGuard AI</span>
         </div>

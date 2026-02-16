@@ -7,6 +7,7 @@ import {
 import { Button } from "@/src/components/ui/button";
 import { Package, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import Image from 'next/image';
 
 export default async function Page({
   searchParams,
@@ -20,8 +21,13 @@ export default async function Page({
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Package className="h-5 w-5 text-primary-foreground" />
+            <div className="flex w-12 items-center justify-center rounded-lg">
+                  <Image
+                    src="/DepGuardAI_Logo.png"
+                    width={1000}
+                    height={1000}
+                    alt="DepGuard AI Logo"
+                  />
             </div>
             <span className="text-xl font-semibold text-foreground">
               DepGuard AI

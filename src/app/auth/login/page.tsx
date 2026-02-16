@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { Package, Loader2 } from "lucide-react";
+import Image from 'next/image';
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -52,8 +53,13 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Package className="h-5 w-5 text-primary-foreground" />
+            <div className="flex w-12 items-center justify-center rounded-lg">
+                  <Image
+                    src="/DepGuardAI_Logo.png"
+                    width={1000}
+                    height={1000}
+                    alt="DepGuard AI Logo"
+                  />
             </div>
             <span className="text-xl font-semibold text-foreground">
               DepGuard AI
