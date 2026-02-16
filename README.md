@@ -20,7 +20,6 @@ DepGuard AI is a dependency management platform designed for modern development 
 - **Backend & Database**: [Supabase](https://supabase.io/) (Auth, Postgres, Storage)
 - **AI**: [OpenAI API](https://openai.com/)
 - **Email**: [Resend](https://resend.com/) for sending invitations.
-- **Deployment**: Vercel or any platform with Next.js support.
 
 ## Getting Started
 
