@@ -39,6 +39,17 @@ import {
   TableRow,
 } from "@/src/components/ui/table";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/src/components/ui/alert-dialog";
+import {
   ArrowLeft,
   GitBranch,
   RefreshCw,
@@ -51,6 +62,7 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -144,6 +156,8 @@ export function ProjectDetailPage({
 }: Props) {
   const router = useRouter();
   const [isScanning, setIsScanning] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [expandedDep, setExpandedDep] = useState<string | null>(null);
@@ -206,6 +220,111 @@ export function ProjectDetailPage({
       toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setIsScanning(false);
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    setIsDeleting(true);
+    try {
+      const supabase = createClient();
+      
+      // First, check if the user has permission to delete this project
+      const { data: projectCheck, error: checkError } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("id", project.id)
+        .single();
+      
+      if (checkError || !projectCheck) {
+        throw new Error("Project not found or you don't have permission to delete it");
+      }
+
+      // Check if there are dependencies to delete
+      const { count: dependenciesCount, error: countDepsError } = await supabase
+        .from("dependencies")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", project.id);
+      
+      if (countDepsError) {
+        console.error("Error counting dependencies:", countDepsError);
+      }
+      
+      // Only delete dependencies if there are any
+      if (dependenciesCount && dependenciesCount > 0) {
+        console.log(`Deleting ${dependenciesCount} dependencies...`);
+        const { error: depsError } = await supabase
+          .from("dependencies")
+          .delete()
+          .eq("project_id", project.id);
+        
+        if (depsError) {
+          console.error("Error deleting dependencies:", depsError);
+          throw new Error(`Failed to delete dependencies: ${depsError.message}`);
+        }
+      } else {
+        console.log("No dependencies to delete");
+      }
+
+      // Check if there are project members to delete
+      const { count: membersCount, error: countMembersError } = await supabase
+        .from("project_members")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", project.id);
+      
+      if (countMembersError) {
+        console.error("Error counting project members:", countMembersError);
+      }
+      
+      // Only delete project members if there are any
+      if (membersCount && membersCount > 0) {
+        console.log(`Deleting ${membersCount} project members...`);
+        const { error: membersError } = await supabase
+          .from("project_members")
+          .delete()
+          .eq("project_id", project.id);
+        
+        if (membersError) {
+          console.error("Error deleting project members:", membersError);
+          throw new Error(`Failed to delete project members: ${membersError.message}`);
+        }
+      } else {
+        console.log("No project members to delete");
+      }
+
+      // Finally delete the project
+      console.log("Deleting project...");
+      const { error: projectError } = await supabase
+        .from("projects")
+        .delete()
+        .eq("id", project.id);
+
+      if (projectError) {
+        console.error("Error deleting project:", projectError);
+        
+        // Check for specific error types
+        if (projectError.code === '42501') {
+          throw new Error("You don't have permission to delete this project");
+        } else if (projectError.code === '23503') {
+          throw new Error("Cannot delete project because it has related records that couldn't be removed");
+        } else {
+          throw new Error(`Failed to delete project: ${projectError.message}`);
+        }
+      }
+
+      toast.success("Project deleted successfully");
+      
+      // Close dialog and redirect
+      setDeleteDialogOpen(false);
+      router.push("/dashboard/projects");
+      router.refresh(); // Refresh the router to update any cached data
+      
+    } catch (error: unknown) {
+      console.error("Delete project error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete project"
+      );
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -350,6 +469,7 @@ export function ProjectDetailPage({
                   type="file"
                   accept=".json"
                   required
+                  className="cursor-pointer"
                 />
                 <Button type="submit" disabled={isScanning}>
                   {isScanning ? (
@@ -378,6 +498,46 @@ export function ProjectDetailPage({
               )}
               Re-scan
             </Button>
+          )}
+          
+          {/* Delete Project Button */}
+          {/* Delete Project Button - Only show if user can manage */}
+          {canManage && (
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button className="border border-red-600 bg-transparent text-red-600 hover:bg-red-600 hover:text-white" size="sm">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the
+                    project "{project.name}" and all of its dependencies ({dependencies.length} packages) 
+                    and member associations ({projectMembers.length} members).
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteProject}
+                    disabled={isDeleting}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      "Delete Project"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       </div>

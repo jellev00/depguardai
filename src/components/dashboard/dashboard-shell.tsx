@@ -24,6 +24,7 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
 import { cn } from "@/src/lib/utils";
+import Image from 'next/image'
 
 export type UserContext = {
   id: string;
@@ -86,10 +87,18 @@ export function DashboardShell({
       {/* Sidebar */}
       <aside className="hidden w-64 flex-col border-r bg-card lg:flex">
         <div className="flex h-14 items-center gap-2 border-b px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <Package className="h-4 w-4 text-primary-foreground" />
+          </div> */}
+          <div className="flex w-12 items-center justify-center rounded-lg">
+                <Image
+                  src="/DepGuardAI_Logo.png"
+                  width={1000}
+                  height={1000}
+                  alt="DepGuard AI Logo"
+                />
           </div>
-          <span className="font-semibold text-foreground">DepGuard AI</span>
+          <span className="text-xl font-bold text-foreground">DepGuard AI</span>
         </div>
 
         <nav className="flex-1 p-3">

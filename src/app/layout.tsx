@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "DepGuard AI",
   description:
     "Track, manage, and analyze your project dependencies with AI-powered insights across your entire team.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export const viewport: Viewport = {
