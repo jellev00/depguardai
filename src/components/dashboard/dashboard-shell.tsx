@@ -85,7 +85,7 @@ export function DashboardShell({
   return (
     <div className="flex min-h-svh">
       {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-card lg:flex">
+      <aside className="fixed left-0 top-0 z-30 hidden h-svh w-64 flex-col border-r bg-card lg:flex">
         <div className="flex h-14 items-center gap-2 border-b px-4">
           <div className="flex w-12 items-center justify-center rounded-lg">
                 <Image
@@ -205,7 +205,7 @@ export function DashboardShell({
           </nav>
         </header>
 
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto lg:ml-64">{children}</main>
       </div>
     </div>
   );
