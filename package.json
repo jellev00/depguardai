@@ -8,8 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run",
-    "prepare": "husky"
+    "test": "vitest run"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": ["eslint --fix", "vitest run --passWithNoTests"]
