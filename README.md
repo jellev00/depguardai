@@ -126,7 +126,25 @@ const MODEL = "google:gemini-1.5-pro";
 4.  Copy the entire content of `scripts/001_create_schema.sql` and paste it into the editor.
 5.  Click **Run** to execute the script. This will create all the necessary tables, roles, policies, and triggers.
 
-### 6. Run the Development Server
+### 6. Run the Mastra Server (Required)
+
+Before starting the Next.js development server, you must first start the Mastra AI server.
+
+The Mastra server handles AI-powered dependency analysis and must be running for the application to function correctly.
+
+Run the following command:
+
+```bash
+npm run dev:mastra
+```
+
+This will start the Mastra server locally.
+
+<aside> 
+⚠️ Important: - You must start the Mastra server **before** running `npm run dev`. - If the Mastra server is not running, AI-powered dependency analysis will not work. 
+</aside>
+
+### 7. Run the Development Server
 
 ```bash
 npm run dev
