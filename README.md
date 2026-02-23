@@ -114,7 +114,7 @@ const MODEL = "google:gemini-1.5-pro";
 <aside>
 ✅ Make sure that:
 
-- Your `.env.local` API key matches the selected provider.
+- Your `.env` API key matches the selected provider.
 - Only one `MODEL` constant is active (the other must be commented out).
 </aside>
 
