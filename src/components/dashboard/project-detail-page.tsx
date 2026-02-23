@@ -67,6 +67,8 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type Dependency = {
   id: string;
@@ -688,9 +690,68 @@ export function ProjectDetailPage({
                                         AI Changelog Summary
                                       </span>
                                     </div>
-                                    <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                                    <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                                      <ReactMarkdown 
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                          // Minimale spacing voor markdown elementen
+                                          p: ({node, ...props}) => (
+                                            <p className="text-sm text-muted-foreground leading-snug my-0.5" {...props} />
+                                          ),
+                                          ul: ({node, ...props}) => (
+                                            <ul className="list-disc pl-4 text-sm text-muted-foreground leading-snug my-0.5 space-y-0" {...props} />
+                                          ),
+                                          ol: ({node, ...props}) => (
+                                            <ol className="list-decimal pl-4 text-sm text-muted-foreground leading-snug my-0.5 space-y-0" {...props} />
+                                          ),
+                                          li: ({node, ...props}) => (
+                                            <li className="text-sm text-muted-foreground leading-snug my-0" {...props} />
+                                          ),
+                                          h1: ({node, ...props}) => (
+                                            <h1 className="text-base font-semibold text-foreground my-1 leading-snug" {...props} />
+                                          ),
+                                          h2: ({node, ...props}) => (
+                                            <h2 className="text-sm font-semibold text-foreground my-0.5 leading-snug" {...props} />
+                                          ),
+                                          h3: ({node, ...props}) => (
+                                            <h3 className="text-sm font-medium text-foreground my-0.5 leading-snug" {...props} />
+                                          ),
+                                          code: ({node, inline, ...props}) => 
+                                            inline ? 
+                                              <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono text-foreground" {...props} /> :
+                                              <code className="block bg-muted p-1.5 rounded text-xs font-mono text-foreground overflow-x-auto my-1 leading-snug" {...props} />,
+                                          pre: ({node, ...props}) => (
+                                            <pre className="bg-muted p-1.5 rounded overflow-x-auto my-1 leading-snug" {...props} />
+                                          ),
+                                          a: ({node, ...props}) => (
+                                            <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+                                          ),
+                                          blockquote: ({node, ...props}) => (
+                                            <blockquote className="border-l-2 border-primary/30 pl-2 text-muted-foreground my-1 leading-snug text-sm" {...props} />
+                                          ),
+                                          hr: ({node, ...props}) => (
+                                            <hr className="my-1.5 border-border" {...props} />
+                                          ),
+                                          table: ({node, ...props}) => (
+                                            <table className="min-w-full border-collapse border border-border text-xs my-1 leading-snug" {...props} />
+                                          ),
+                                          thead: ({node, ...props}) => (
+                                            <thead className="bg-muted/50" {...props} />
+                                          ),
+                                          th: ({node, ...props}) => (
+                                            <th className="px-1.5 py-0.5 text-left font-medium text-foreground" {...props} />
+                                          ),
+                                          td: ({node, ...props}) => (
+                                            <td className="px-1.5 py-0.5 text-muted-foreground" {...props} />
+                                          ),
+                                        }}
+                                      >
+                                        {dep.aiSummary}
+                                      </ReactMarkdown>
+                                    </div>
+                                    {/* <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
                                       {dep.aiSummary}
-                                    </p>
+                                    </p> */}
                                   </div>
                                 ) : (
                                   <div className="flex items-center gap-3">
