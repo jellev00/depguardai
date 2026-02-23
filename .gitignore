@@ -33,5 +33,6 @@ __v0_jsx-dev-runtime.ts
 # Common ignores
 node_modules/
 .next/
+.mastra/
 .env*.local
 .DS_Store
