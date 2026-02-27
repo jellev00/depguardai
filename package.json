@@ -7,7 +7,7 @@
     "dev:mastra": "mastra dev --dir src/mastra",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint src",
     "test": "vitest run"
   },
   "lint-staged": {
