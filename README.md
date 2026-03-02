@@ -18,7 +18,7 @@ DepGuard AI is a dependency management platform designed for modern development 
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI**: [shadcn/ui](https://ui.shadcn.com/)
 - **Backend & Database**: [Supabase](https://supabase.io/) (Auth, Postgres, Storage)
-- **AI**: [OpenAI API](https://openai.com/)
+- **AI**: [OpenAI API](https://openai.com/) or [Google AI Studio](https://aistudio.google.com/)
 - **Email**: [Resend](https://resend.com/) for sending invitations.
 
 ## Getting Started
@@ -48,7 +48,7 @@ npm install --legacy-peer-deps
 
 ### 3. Set Up Environment Variables
 
-Create a `.env.local` file in the root of the project and add the following environment variables. You can get the Supabase URL and anon key from your project's API settings.
+Create a `.env` file in the root of the project and add the following environment variables. You can get the Supabase URL and anon key from your project's API settings.
 
 ```bash
 # Email (Optional - invitations can be accepted via a direct link)
@@ -59,7 +59,66 @@ NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-### 4. Set Up Supabase Database
+#### 3.1 AI Model Configuration (Required)
+
+DepGuard AI supports two AI providers:
+
+OpenAI
+
+Google (via Google Generative AI)
+
+In your `.env` file, you must configure only one of the following:
+
+```bash
+# Option 1: OpenAI
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+
+# Option 2: Google Generative AI
+GOOGLE_GENERATIVE_AI_API_KEY=YOUR_GOOGLE_GENERATIVE_AI_API_KEY
+```
+
+⚠️ Only configure the provider you intend to use.
+
+### 4. Configure the AI Model in the Codebase
+
+In addition to setting your API key, you must also configure which model is used in the code.
+
+Open the following file:
+
+src/mastra/agents/dependency-agent.ts
+
+Inside this file, locate the MODEL constant. You will see two options defined.
+
+Depending on which API key you configured in .env.local, you must comment out one of the MODEL definitions.
+
+Example:
+
+```javascript
+// For OpenAI
+const MODEL = "openai:gpt-4o-mini";
+
+// For Google Generative AI
+// const MODEL = "google:gemini-1.5-pro"
+```
+
+If you are using Google instead:
+
+```javascript
+// For OpenAI
+// const MODEL = "openai:gpt-4o-mini"
+
+// For Google Generative AI
+const MODEL = "google:gemini-1.5-pro";
+```
+
+<aside>
+✅ Make sure that:
+
+- Your `.env` API key matches the selected provider.
+- Only one `MODEL` constant is active (the other must be commented out).
+</aside>
+
+### 5. Set Up Supabase Database
 
 1.  Navigate to your Supabase project dashboard.
 2.  Go to the **SQL Editor**.
@@ -67,7 +126,25 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 4.  Copy the entire content of `scripts/001_create_schema.sql` and paste it into the editor.
 5.  Click **Run** to execute the script. This will create all the necessary tables, roles, policies, and triggers.
 
-### 5. Run the Development Server
+### 6. Run the Mastra Server (Required)
+
+Before starting the Next.js development server, you must first start the Mastra AI server.
+
+The Mastra server handles AI-powered dependency analysis and must be running for the application to function correctly.
+
+Run the following command:
+
+```bash
+npm run dev:mastra
+```
+
+This will start the Mastra server locally.
+
+<aside> 
+⚠️ Important: - You must start the Mastra server **before** running `npm run dev`. - If the Mastra server is not running, AI-powered dependency analysis will not work. 
+</aside>
+
+### 7. Run the Development Server
 
 ```bash
 npm run dev

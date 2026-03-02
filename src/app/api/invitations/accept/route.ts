@@ -4,7 +4,29 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const { token, fullName, password } = await request.json();
+
+    // Add debug logging
+    console.log("Received token:", token);
+    console.log("Full token value:", JSON.stringify({ token, fullName }));
+
     const supabase = await createClient();
+
+    // First, let's check if the token exists at all (including accepted invitations)
+    console.log("Checking all invitations with token:", token);
+    const { data: allInvitations, error: allError } = await supabase
+      .from("invitations")
+      .select("*")
+      .eq("token", token);
+
+    console.log("All invitations with this token:", { 
+      count: allInvitations?.length, 
+      data: allInvitations,
+      error: allError 
+    });
+
+    if (allError) {
+      console.error("Error querying invitations:", allError);
+    }
 
     // Find the invitation
     const { data: invitation, error: invError } = await supabase
