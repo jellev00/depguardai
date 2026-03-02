@@ -357,20 +357,56 @@ export function ProjectDetailPage({
     setIsAddingMember(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase.from("project_members").insert({
-        project_id: project.id,
-        user_id: selectedMember,
-        role: selectedRole,
-      });
-      if (error) throw error;
+
+      // 1. Check if the user is already a member
+      const { data: existing, error: checkError } = await supabase
+        .from("project_members")
+        .select("id")
+        .eq("project_id", project.id)
+        .eq("user_id", selectedMember)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking existing member:", checkError);
+        throw new Error(`Error checking membership: ${checkError.message}`);
+      }
+
+      if (existing) {
+        toast.error("User is already a member of this project");
+        return;
+      }
+
+      // 2. Attempt the insert and capture the full error
+      const { data, error: insertError } = await supabase
+        .from("project_members")
+        .insert({
+          project_id: project.id,
+          user_id: selectedMember,
+          role: selectedRole,
+        })
+        .select();
+
+      if (insertError) {
+        // Log the complete error object to the console
+        console.error("Full Supabase insert error:", JSON.stringify(insertError, null, 2));
+        console.error("Error code:", insertError.code);
+        console.error("Error message:", insertError.message);
+        console.error("Error details:", insertError.details);
+        console.error("Error hint:", insertError.hint);
+
+        // Throw a detailed error for the toast
+        throw new Error(`Insert failed (${insertError.code}): ${insertError.message}`);
+      }
+
+      console.log("Insert successful:", data);
       toast.success("Member added to project");
       setSelectedMember("");
       setAddMemberOpen(false);
       router.refresh();
+
     } catch (error: unknown) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to add member"
-      );
+      console.error("Add member error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to add member");
     } finally {
       setIsAddingMember(false);
     }

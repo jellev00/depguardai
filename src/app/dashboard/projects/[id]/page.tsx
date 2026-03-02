@@ -29,10 +29,55 @@ export default async function Page({
     .eq("project_id", id)
     .order("name");
 
-  const { data: projectMembers } = await supabase
+  // In your parent page.tsx, replace the project members section with:
+
+  // Get project members with a direct join (not using the nested select)
+  const { data: projectMembers, error: membersError } = await supabase
     .from("project_members")
-    .select("id, role, user_id, profiles(id, email, full_name)")
+    .select(`
+      id,
+      project_id,
+      user_id,
+      role,
+      added_at
+    `)
     .eq("project_id", id);
+
+  console.log("Project members raw:", projectMembers);
+
+  // Get profiles for these users
+  let processedProjectMembers: any[] = [];
+
+  if (projectMembers && projectMembers.length > 0) {
+    const userIds = projectMembers.map(m => m.user_id);
+    
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, email, full_name")
+      .in("id", userIds);
+    
+    console.log("Profiles:", profiles);
+    
+    // Create a map for easy lookup
+    const profileMap = new Map();
+    profiles?.forEach(p => {
+      profileMap.set(p.id, p);
+    });
+    
+    // Combine the data
+    processedProjectMembers = projectMembers.map(member => {
+      const profile = profileMap.get(member.user_id);
+      return {
+        id: member.id,
+        userId: member.user_id,
+        role: member.role,
+        email: profile?.email || "",
+        fullName: profile?.full_name || "",
+      };
+    });
+    
+    console.log("Processed project members:", processedProjectMembers);
+  }
 
   // Get company members for assignment
   const { data: companyMembers } = await supabase
@@ -78,13 +123,13 @@ export default async function Page({
         })) || []
       }
       projectMembers={
-        projectMembers?.map((m) => ({
+        processedProjectMembers?.map((m) => ({
           id: m.id,
-          userId: m.user_id,
+          userId: m.userId,
           role: m.role,
-          email: (m.profiles as { email: string } | null)?.email || "",
+          email: (m.email as string) || "",
           fullName:
-            (m.profiles as { full_name: string } | null)?.full_name || "",
+            (m.fullName as string) || "",
         })) || []
       }
       companyMembers={
