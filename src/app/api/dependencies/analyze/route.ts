@@ -14,28 +14,44 @@ export async function POST(request: Request) {
       await request.json();
 
     // Roep de Mastra server aan via HTTP (geen import nodig)
-    const mastraRes = await fetch("http://localhost:4111/api/agents/dependencyAgent/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    // const mastraRes = await fetch("http://localhost:4111/api/agents/dependencyAgent/generate", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     messages: [
+    //       {
+    //         role: "user",
+    //         content: `Use the fetch-npm-info tool with packageName="${name}", fromVersion="${currentVersion}", toVersion="${latestVersion}".
+
+    //         Then analyze the update for "${name}" from version ${currentVersion} to ${latestVersion} based on the actual release notes you retrieved.`,
+    //       },
+    //     ],
+    //   }),
+    // });
+
+    // if (!mastraRes.ok) {
+    //   const err = await mastraRes.text();
+    //   throw new Error(`Mastra error: ${err}`);
+    // }
+
+    // const mastraData = await mastraRes.json();
+    // const summary = mastraData.text;
+
+    // Roep de n8n server aan via HTTP (geen import nodig)
+    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+
+    const n8nRes = await fetch("http://localhost:5678/webhook-test/analyze-dependency", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [
-          {
-            role: "user",
-            content: `Use the fetch-npm-info tool with packageName="${name}", fromVersion="${currentVersion}", toVersion="${latestVersion}".
+        packageName: name,
+        fromVersion: currentVersion,
+        toVersion: latestVersion,
+      })
+    })
 
-            Then analyze the update for "${name}" from version ${currentVersion} to ${latestVersion} based on the actual release notes you retrieved.`,
-          },
-        ],
-      }),
-    });
-
-    if (!mastraRes.ok) {
-      const err = await mastraRes.text();
-      throw new Error(`Mastra error: ${err}`);
-    }
-
-    const mastraData = await mastraRes.json();
-    const summary = mastraData.text;
+    const n8nData = await n8nRes.json();
+    const summary = n8nData.summary;
 
     await supabase
       .from("dependencies")
