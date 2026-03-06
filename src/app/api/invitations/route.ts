@@ -53,15 +53,24 @@ export async function POST(request: Request) {
 
         await resend.emails.send({
           // from: "DepGuard AI <onboarding@resend.dev>",
-          from: 'onboarding@resend.dev',
+          from: 'DepGuard AI <noreply@depguardai.be>',
           to: [email],
           subject: `You're invited to join ${company.name} on DepGuard AI`,
           html: `
-            <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-              <h2>You're invited to ${company.name}</h2>
-              <p>You've been invited to join <strong>${company.name}</strong> on DepGuard AI as a ${roles.map((r: string) => r.replace("_", " ")).join(", ")}.</p>
-              <p><a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Accept Invitation</a></p>
-              <p style="color: #666; font-size: 14px;">This invitation expires in 7 days.</p>
+            <div style="font-family: sans-serif; max-width: 480px; margin: 0;">
+              <div style="margin-bottom: 24px;">
+                <h1 style="margin: 0; font-size: 24px; color: #111;">DepGuard <span style="color: #2563eb;">AI</span></h1>
+              </div>
+              
+              <h2 style="margin-top: 0; margin-bottom: 16px;">You're invited to ${company.name}</h2>
+              
+              <p style="margin-bottom: 24px;">You've been invited to join <strong>${company.name}</strong> on DepGuard AI as a ${roles.map((r: string) => r.replace("_", " ")).join(", ")}.</p>
+              
+              <p style="margin-bottom: 24px;">
+                <a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Accept Invitation</a>
+              </p>
+              
+              <p style="color: #666; font-size: 14px; margin-bottom: 0;">This invitation expires in 7 days.</p>
             </div>
           `,
         });

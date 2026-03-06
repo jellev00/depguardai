@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:win": "next dev --webpack",
     "dev:mastra": "mastra dev --dir src/mastra",
     "build": "next build",
     "start": "next start",
