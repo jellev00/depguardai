@@ -67,6 +67,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 type Dependency = {
   id: string;
@@ -724,9 +725,15 @@ export function ProjectDetailPage({
                                         AI Changelog Summary
                                       </span>
                                     </div>
-                                    <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
-                                      {dep.aiSummary}
-                                    </p>
+                                    <div className="prose prose-sm dark:prose-invert max-w-non text-muted-foreground
+                                      [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1
+                                      [&_ul]:my-1 [&_li]:my-0.5
+                                      [&_strong]:text-foreground [&_strong]:font-medium
+                                      [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:text-xs [&_blockquote]:italic
+                                      [&_a]:text-primary [&_a]:underline"
+                                    >
+                                      <ReactMarkdown>{dep.aiSummary}</ReactMarkdown>
+                                    </div>
                                   </div>
                                 ) : (
                                   <div className="flex items-center gap-3">
