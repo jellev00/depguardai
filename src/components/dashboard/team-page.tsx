@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/src/components/ui/alert-dialog";
-import { UserPlus, Loader2, Trash2, Mail, Clock } from "lucide-react";
+import { UserPlus, Loader2, Trash2, Mail, Clock, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -86,6 +86,7 @@ export function TeamPage({
   const [inviteRoles, setInviteRoles] = useState<string[]>([]);
   const [isInviting, setIsInviting] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +153,12 @@ export function TeamPage({
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
   };
+
+  const filteredMembers = members.filter((member) => 
+    (member.fullName || member.email)
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -227,91 +234,108 @@ export function TeamPage({
 
       {/* Members */}
       <Card>
-        <CardHeader>
-          <CardTitle>Members ({members.length})</CardTitle>
-          <CardDescription>Active team members in your company</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Members ({members.length})</CardTitle>
+            <CardDescription>Active team members in your company</CardDescription>
+          </div>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
+              placeholder="Search members..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-2">
-            {members.map((member) => {
-              const initials = (member.fullName || member.email)
-                .split(/[\s@]/)
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2);
+          {filteredMembers.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {members.length === 0 ? "No Members yet." : "No members match your search."}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {filteredMembers.map((member) => {
+                const initials = (member.fullName || member.email)
+                  .split(/[\s@]/)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2);
 
-              return (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-primary/10 text-xs text-primary">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {member.fullName || member.email}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {member.email}
-                      </p>
+                return (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className="bg-primary/10 text-xs text-primary">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {member.fullName || member.email}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {member.email}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      {member.roles.map((role) => (
-                        <Badge key={role} variant="secondary" className="text-xs">
-                          {formatRole(role)}
-                        </Badge>
-                      ))}
-                    </div>
-                    {isOwner &&
-                      member.userId !== currentUserId &&
-                      !member.roles.includes("owner") && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Remove member</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Remove member</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to remove{" "}
-                                {member.fullName || member.email} from the team?
-                                This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleRemoveMember(member.id)}
-                                disabled={removingId === member.id}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    <div className="flex items-center gap-3">
+                      <div className="flex gap-1">
+                        {member.roles.map((role) => (
+                          <Badge key={role} variant="secondary" className="text-xs">
+                            {formatRole(role)}
+                          </Badge>
+                        ))}
+                      </div>
+                      {isOwner &&
+                        member.userId !== currentUserId &&
+                        !member.roles.includes("owner") && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
                               >
-                                {removingId === member.id
-                                  ? "Removing..."
-                                  : "Remove"}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )}
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Remove member</span>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Remove member</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to remove{" "}
+                                  {member.fullName || member.email} from the team?
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleRemoveMember(member.id)}
+                                  disabled={removingId === member.id}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  {removingId === member.id
+                                    ? "Removing..."
+                                    : "Remove"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
