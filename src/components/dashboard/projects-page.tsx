@@ -43,6 +43,8 @@ type Project = {
   githubUrl: string;
   createdAt: string;
   depCount: number;
+  outdatedCount: number;
+  breakingCount: number;
 };
 
 type Member = {
@@ -236,13 +238,23 @@ export function ProjectsPage({
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="text-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="secondary" className="text-xs whitespace-nowrap">
                       <Package className="mr-1 h-3 w-3" />
                       {project.depCount} deps
                     </Badge>
+                    {project.outdatedCount > 0 && (
+                      <Badge variant="secondary" className="bg-warning/10 text-warning whitespace-nowrap">
+                        {project.outdatedCount} outdated
+                      </Badge>
+                    )}
+                    {project.breakingCount > 0 && (
+                      <Badge variant="secondary" className="bg-destructive/10 text-destructive whitespace-nowrap">
+                        {project.breakingCount} breaking
+                      </Badge>
+                    )}
                     {project.githubUrl && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs whitespace-nowrap">
                         <GitBranch className="mr-1 h-3 w-3" />
                         GitHub
                       </Badge>
