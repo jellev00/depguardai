@@ -31,6 +31,9 @@ import {
   GitBranch,
   Package,
   ArrowRight,
+  CalendarClock,
+  AlertTriangle,
+  TrendingDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -53,6 +56,8 @@ type Member = {
   fullName: string;
 };
 
+type SortKey = "createdAt" | "outdatedCount" | "breakingCount";
+
 type Props = {
   companyId: string;
   currentUserId: string;
@@ -60,6 +65,24 @@ type Props = {
   projects: Project[];
   members: Member[];
 };
+
+const SORT_OPTIONS: { key: SortKey; label: string; icon: React.ReactNode }[] = [
+  {
+    key: "createdAt",
+    label: "Recentste",
+    icon: <CalendarClock className="h-3.5 w-3.5" />,
+  },
+  {
+    key: "outdatedCount",
+    label: "Outdated",
+    icon: <TrendingDown className="h-3.5 w-3.5" />,
+  },
+  {
+    key: "breakingCount",
+    label: "Breaking",
+    icon: <AlertTriangle className="h-3.5 w-3.5" />,
+  },
+];
 
 export function ProjectsPage({
   companyId,
@@ -73,6 +96,14 @@ export function ProjectsPage({
   const [description, setDescription] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("createdAt");
+
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (sortKey === "createdAt") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    return b[sortKey] - a[sortKey];
+  });
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +231,30 @@ export function ProjectsPage({
         )}
       </div>
 
-      {projects.length === 0 ? (
+      {/* Sort controls */}
+      {projects.length > 1 && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Sorteer op:</span>
+          <div className="flex items-center rounded-md border bg-muted p-0.5 gap-0.5">
+            {SORT_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => setSortKey(option.key)}
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortKey === option.key
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {option.icon}
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {sortedProjects.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -216,7 +270,7 @@ export function ProjectsPage({
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
+          {sortedProjects.map((project) => (
             <Link
               key={project.id}
               href={`/dashboard/projects/${project.id}`}
@@ -245,11 +299,13 @@ export function ProjectsPage({
                     </Badge>
                     {project.outdatedCount > 0 && (
                       <Badge variant="secondary" className="bg-warning/10 text-warning whitespace-nowrap">
+                        <TrendingDown className="mr-1 h-3 w-3" />
                         {project.outdatedCount} outdated
                       </Badge>
                     )}
                     {project.breakingCount > 0 && (
                       <Badge variant="secondary" className="bg-destructive/10 text-destructive whitespace-nowrap">
+                        <AlertTriangle className="mr-1 h-3 w-3" />
                         {project.breakingCount} breaking
                       </Badge>
                     )}
