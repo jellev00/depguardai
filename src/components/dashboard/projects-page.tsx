@@ -69,7 +69,7 @@ type Props = {
 const SORT_OPTIONS: { key: SortKey; label: string; icon: React.ReactNode }[] = [
   {
     key: "createdAt",
-    label: "Recentste",
+    label: "Latest",
     icon: <CalendarClock className="h-3.5 w-3.5" />,
   },
   {
