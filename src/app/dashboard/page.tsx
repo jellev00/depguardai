@@ -38,9 +38,7 @@ export default async function DashboardPage() {
     .limit(5);
 
   const allDeps = projects?.flatMap((p) => p.dependencies || []) || [];
-  const outdatedCount = allDeps.filter(
-    (d) => d.current_version !== d.latest_version && d.latest_version
-  ).length;
+  const outdatedCount = allDeps.filter((d) => d.status === "outdated").length
   const breakingCount = allDeps.filter((d) => d.status === "breaking").length;
 
   return (
@@ -57,10 +55,7 @@ export default async function DashboardPage() {
           id: p.id,
           name: p.name,
           depCount: p.dependencies?.length || 0,
-          outdatedCount:
-            p.dependencies?.filter(
-              (d) => d.current_version !== d.latest_version && d.latest_version
-            ).length || 0,
+          outdatedCount: p.dependencies.filter((d) => d.status === "outdated").length,
           breakingCount: p.dependencies.filter((d) => d.status === "breaking").length,
         })) || []
       }
