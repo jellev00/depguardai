@@ -28,7 +28,7 @@ export default async function Page() {
   const { data: projects } = await supabase
     .from("projects")
     .select(
-      "id, name, description, github_url, created_at, created_by, dependencies(id)"
+      "id, name, description, github_url, created_at, created_by, dependencies(id, current_version, latest_version, status, update_type)"
     )
     .eq("company_id", profile.company_id)
     .order("created_at", { ascending: false });
@@ -56,6 +56,11 @@ export default async function Page() {
           githubUrl: p.github_url || "",
           createdAt: p.created_at,
           depCount: p.dependencies?.length || 0,
+          outdatedCount:
+            p.dependencies?.filter(
+              (d) => d.current_version !== d.latest_version && d.latest_version
+            ).length || 0,
+          breakingCount: p.dependencies.filter((d) => d.status === "breaking").length,
         })) || []
       }
       members={

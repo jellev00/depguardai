@@ -41,7 +41,7 @@ export default async function DashboardPage() {
   const outdatedCount = allDeps.filter(
     (d) => d.current_version !== d.latest_version && d.latest_version
   ).length;
-  const securityCount = allDeps.filter((d) => d.status === "security").length;
+  const breakingCount = allDeps.filter((d) => d.status === "breaking").length;
 
   return (
     <DashboardOverview
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
         projects: projectCount || 0,
         members: memberCount || 0,
         outdated: outdatedCount,
-        security: securityCount,
+        breaking: breakingCount,
         totalDeps: allDeps.length,
       }}
       recentProjects={
@@ -61,6 +61,7 @@ export default async function DashboardPage() {
             p.dependencies?.filter(
               (d) => d.current_version !== d.latest_version && d.latest_version
             ).length || 0,
+          breakingCount: p.dependencies.filter((d) => d.status === "breaking").length,
         })) || []
       }
     />

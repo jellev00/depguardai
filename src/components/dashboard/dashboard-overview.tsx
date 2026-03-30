@@ -24,7 +24,7 @@ type Props = {
     projects: number;
     members: number;
     outdated: number;
-    security: number;
+    breaking: number;
     totalDeps: number;
   };
   recentProjects: {
@@ -32,6 +32,7 @@ type Props = {
     name: string;
     depCount: number;
     outdatedCount: number;
+    breakingCount: number;
   }[];
 };
 
@@ -59,8 +60,8 @@ export function DashboardOverview({ stats, recentProjects }: Props) {
       bg: "bg-warning/10",
     },
     {
-      label: "Security Issues",
-      value: stats.security,
+      label: "breaking Deps",
+      value: stats.breaking,
       icon: ShieldAlert,
       color: "text-destructive",
       bg: "bg-destructive/10",
@@ -135,10 +136,10 @@ export function DashboardOverview({ stats, recentProjects }: Props) {
                 <Link
                   key={project.id}
                   href={`/dashboard/projects/${project.id}`}
-                  className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 gap-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 shrink-0">
                       <FolderKanban className="h-4 w-4 text-primary" />
                     </div>
                     <div>
@@ -150,14 +151,24 @@ export function DashboardOverview({ stats, recentProjects }: Props) {
                       </p>
                     </div>
                   </div>
-                  {project.outdatedCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-warning/10 text-warning"
-                    >
-                      {project.outdatedCount} outdated
-                    </Badge>
-                  )}
+                  <div className="flex flex-wrap gap-2 ml-12 sm:ml-0">
+                    {project.outdatedCount > 0 && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-warning/10 text-warning"
+                      >
+                        {project.outdatedCount} outdated
+                      </Badge>
+                    )}
+                    {project.breakingCount > 0 && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-destructive/10 text-destructive"
+                      >
+                        {project.breakingCount} breaking
+                      </Badge>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>
