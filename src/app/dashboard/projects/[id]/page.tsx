@@ -119,6 +119,7 @@ export default async function Page({
           updateType: d.update_type || null,
           status: d.status || "unknown",
           aiSummary: d.ai_summary || null,
+          aiSummaryTime: d.ai_summary_time || null,
           lastCheckedAt: d.last_checked_at,
         })) || []
       }

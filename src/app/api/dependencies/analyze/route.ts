@@ -112,7 +112,10 @@ export async function POST(request: Request) {
 
     await supabase
       .from("dependencies")
-      .update({ ai_summary: summary })
+      .update({ 
+        ai_summary: summary,
+        ai_summary_time: new Date().toISOString(),
+      })
       .eq("id", dependencyId);
     
     return NextResponse.json({ summary });
