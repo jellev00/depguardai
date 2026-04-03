@@ -77,6 +77,7 @@ type Dependency = {
   updateType: string | null;
   status: string;
   aiSummary: string | null;
+  aiSummaryTime: string | null;
   lastCheckedAt: string | null;
 };
 
@@ -146,6 +147,16 @@ const UPDATE_STYLES: Record<string, { label: string; className: string }> = {
     className: "bg-primary/10 text-primary border-primary/20",
   },
 };
+
+function formatRelativeTime(isoString: string | null): string {
+  if (!isoString) return "-";
+  const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  const m = Math.floor(diff / 60) % 60;
+  const h = Math.floor(diff / 3600) % 24;
+  const d = Math.floor(diff / 86400);
+  return [d && `${d}d`, h && `${h}h`, m && `${m}m`].filter(Boolean).join("") + " ago";
+}
 
 export function ProjectDetailPage({
   project,
@@ -633,6 +644,7 @@ export function ProjectDetailPage({
                     <TableHead>Latest</TableHead>
                     <TableHead>Update</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Last AI</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -692,6 +704,14 @@ export function ProjectDetailPage({
                             >
                               {statusStyle.label}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className="text-xs text-muted-foreground"
+                              title={dep.aiSummaryTime ?? "Never analyzed"}
+                            >
+                              {formatRelativeTime(dep.aiSummaryTime)}
+                            </span>
                           </TableCell>
                           <TableCell className="text-right">
                             <Button
