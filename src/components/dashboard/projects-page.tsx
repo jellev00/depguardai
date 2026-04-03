@@ -241,6 +241,7 @@ export function ProjectsPage({
                   key={option.key}
                   onClick={() => setSortKey(option.key)}
                   variant={sortKey  === option.key ? "default" : "outline"}
+                  className="text-xs"
                 >
                   {option.icon}
                   {option.label}
