@@ -56,10 +56,7 @@ export default async function Page() {
           githubUrl: p.github_url || "",
           createdAt: p.created_at,
           depCount: p.dependencies?.length || 0,
-          outdatedCount:
-            p.dependencies?.filter(
-              (d) => d.current_version !== d.latest_version && d.latest_version
-            ).length || 0,
+          outdatedCount: p.dependencies.filter((d) => d.status === "outdated").length,
           breakingCount: p.dependencies.filter((d) => d.status === "breaking").length,
         })) || []
       }

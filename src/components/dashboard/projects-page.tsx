@@ -234,23 +234,19 @@ export function ProjectsPage({
       {/* Sort controls */}
       {projects.length > 1 && (
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Sorteer op:</span>
-          <div className="flex items-center rounded-md border bg-muted p-0.5 gap-0.5">
-            {SORT_OPTIONS.map((option) => (
-              <button
-                key={option.key}
-                onClick={() => setSortKey(option.key)}
-                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                  sortKey === option.key
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {option.icon}
-                {option.label}
-              </button>
-            ))}
-          </div>
+          {/* <span className="text-xs text-muted-foreground">Sorteer op:</span> */}
+            <div className="flex flex-wrap gap-2">
+              {SORT_OPTIONS.map((option) => (
+                <Button
+                  key={option.key}
+                  onClick={() => setSortKey(option.key)}
+                  variant={sortKey  === option.key ? "default" : "outline"}
+                >
+                  {option.icon}
+                  {option.label}
+                </Button>
+              ))}
+            </div>
         </div>
       )}
 
