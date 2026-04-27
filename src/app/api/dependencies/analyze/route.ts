@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     } else if (n8nAvailable) {
       // --- n8n ---
       const n8nRes = await fetch(
-        `${N8N_BASE_URL}/webhook-test/analyze-dependency`,
+        `${N8N_BASE_URL}/webhook/analyze-dependency`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

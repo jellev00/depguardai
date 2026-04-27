@@ -4,8 +4,8 @@ import { google } from "@ai-sdk/google";
 import { fetchNpmInfoTool } from "../tools/npm-tool";
 import { webChangelogSearchTool } from "../tools/web-changelog-search-tool";
 
-const MODEL = google("gemini-2.5-flash");
-// const MODEL = openai("gpt-4o-mini");
+// const MODEL = google("gemini-2.5-flash");
+const MODEL = openai("gpt-4o-mini");
 
 export const dependencyAgent = new Agent({
       id: "DependencyAnalyzer",

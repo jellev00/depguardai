@@ -1,0 +1,58 @@
+runs_per_prompt: 3
+judge_model: "gpt-4o-mini"
+output_dir: "results"
+
+agents:
+  - name: "Mastra"
+    type: mastra
+    endpoint: "http://localhost:4111/api/agents/dependencyAgent/generate"
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+  - name: "n8n"
+    type: n8n
+    endpoint: "http://localhost:5678/webhook/analyze-dependency"
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+  - name: "OpenAI"
+    type: openai
+    api_key: ""
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+test_prompts:
+  - id: "react_minor"
+    package_name: "react"
+    from_version: "18.2.0"
+    to_version: "18.3.0"
+    update_type: minor
+    notes: "Kleine minor update"
+
+  - id: "nextjs_minor"
+    package_name: "next"
+    from_version: "14.1.0"
+    to_version: "14.2.0"
+    update_type: minor
+    notes: "Next.js minor — heeft eigen changelog site"
+
+  - id: "typescript_major"
+    package_name: "typescript"
+    from_version: "4.9.5"
+    to_version: "5.0.4"
+    update_type: major
+    notes: "Major versie — mogelijk breaking changes"
+
+  - id: "zod_patch"
+    package_name: "zod"
+    from_version: "3.22.3"
+    to_version: "3.22.4"
+    update_type: patch
+    notes: "Kleine patch — verwacht bugfixes"
+
+  - id: "tailwind_minor"
+    package_name: "tailwindcss"
+    from_version: "3.3.0"
+    to_version: "3.4.0"
+    update_type: minor
+    notes: "Tailwind heeft eigen docs site"
