@@ -28,6 +28,18 @@ test_prompts:
     to_version: "18.3.0"
     update_type: minor
     notes: "Kleine minor update"
+    expected_facts:
+      - "18.3.0 is functioneel identiek aan 18.2.0 — er zijn geen nieuwe features toegevoegd"
+      - "De release voegt uitsluitend deprecation warnings toe voor API's die in React 19 worden verwijderd"
+      - "ReactDOM.render is deprecated — vervang door ReactDOM.createRoot"
+      - "ReactDOM.hydrate is deprecated — vervang door ReactDOM.hydrateRoot"
+      - "ReactDOM.unmountComponentAtNode is deprecated — vervang door root.unmount()"
+      - "String refs in class components zijn deprecated — vervang door useRef() of createRef()"
+      - "defaultProps op function components is deprecated"
+      - "Legacy Context API (contextTypes / childContextTypes) is deprecated — vervang door createContext"
+      - "react-dom/test-utils is deprecated — importeer act voortaan direct uit react"
+      - "Geen breaking changes in deze release zelf"
+      - "Safe to update: Yes — drop-in vervanging, enkel nieuwe console-warnings"
 
   - id: "nextjs_minor"
     package_name: "next"
@@ -35,6 +47,16 @@ test_prompts:
     to_version: "14.2.0"
     update_type: minor
     notes: "Next.js minor — heeft eigen changelog site"
+    expected_facts:
+      - "Turbopack stabiliteits- en performanceverbeteringen voor de dev server"
+      - "Vernieuwd error overlay met licht/donker modus voor zowel App Router als Pages Router"
+      - "Verbeterde hydration error messages met broncode van de mismatch"
+      - "Nieuw experimenteel staleTimes config-optie voor Client-side Router Cache"
+      - "Productie build memory gebruik drastisch verminderd: van ~2.2GB naar onder 190MB gemiddeld"
+      - "Nieuw --experimental-debug-memory-usage flag voor next build"
+      - "CSS chunking verbeterd om conflicterende stijlen bij navigatie te vermijden"
+      - "Geen breaking changes"
+      - "Safe to update: Yes"
 
   - id: "typescript_major"
     package_name: "typescript"
@@ -42,6 +64,18 @@ test_prompts:
     to_version: "5.0.4"
     update_type: major
     notes: "Major versie — mogelijk breaking changes"
+    expected_facts:
+      - "Nieuwe ECMAScript Stage 3 decorators (zonder experimentalDecorators flag) — andere API-structuur dan legacy decorators"
+      - "Legacy decorator-libraries (NestJS, TypeORM, Angular) werken NIET met de nieuwe decorators zonder experimentalDecorators: true te blijven gebruiken"
+      - "Nieuwe const modifier op type parameters voor const-achtige type-inferentie"
+      - "Alle enums worden nu behandeld als union enums"
+      - "Nieuw moduleResolution: bundler optie"
+      - "Package grootte ~41% kleiner: van 63.8MB naar ~37MB"
+      - "Minimale Node.js versie is nu 12.20, targets ECMAScript 2018"
+      - "Breaking: relational operators (> < >= <=) tussen string en number geven nu een type error"
+      - "Deprecated tsconfig-opties (warning tot TS 5.5, daarna error): target ES3, out, noImplicitUseStrict, keyofStringsOnly, suppressExcessPropertyErrors, suppressImplicitAnyIndexErrors, noStrictGenericChecks, charset, importsNotUsedAsValues, preserveValueImports"
+      - "Interne compiler API breaking changes: isTypeAssertion verwijderd, diverse factory function overloads verwijderd"
+      - "Safe to update: With caution — controleer decorator-gebruik en deprecated tsconfig-opties"
 
   - id: "zod_patch"
     package_name: "zod"
@@ -49,6 +83,12 @@ test_prompts:
     to_version: "3.22.4"
     update_type: patch
     notes: "Kleine patch — verwacht bugfixes"
+    expected_facts:
+      - "Patch release binnen de 3.22.x lijn — geen nieuwe features, geen breaking changes"
+      - "De officiële changelog van Zod publiceert geen gedetailleerde notes voor individuele patch releases binnen een minor"
+      - "Een agent die SPECIFIEKE bugfixes noemt voor 3.22.4 zonder bronvermelding fabriceert waarschijnlijk details"
+      - "Safe to update: Yes — patch releases in Zod 3.22.x zijn veilig"
+      - "Belangrijk contextfeit: Zod 3.22.4 is de laatste volledig stabiele 3.22.x versie vóór latere 3.2x releases Zod 4-code bevatten"
 
   - id: "tailwind_minor"
     package_name: "tailwindcss"
@@ -56,3 +96,16 @@ test_prompts:
     to_version: "3.4.0"
     update_type: minor
     notes: "Tailwind heeft eigen docs site"
+    expected_facts:
+      - "Dynamische viewport units: dvh, lvh, svh, dvw, lvw, svw classes (werken correct op mobiel)"
+      - "Nieuwe :has() variant: has-[...] om parent elements te stylen op basis van hun children"
+      - "Nieuwe * variant: style directe kinderen met *:class syntax"
+      - "Nieuwe size-* utilities: breedte én hoogte tegelijk instellen (bv. size-4 = w-4 h-4)"
+      - "Nieuwe text-wrap utilities: text-balance en text-pretty voor betere kopregelafbreking"
+      - "Subgrid support: grid-cols-subgrid en grid-rows-subgrid"
+      - "Extended min-width, max-width en min-height schalen"
+      - "Uitgebreide opacity schaal met stappen van 5"
+      - "Nieuwe forced-colors variant voor forced colors mode"
+      - "Grid rows uitgebreid van 6 naar 12"
+      - "Geen breaking changes"
+      - "Safe to update: Yes"

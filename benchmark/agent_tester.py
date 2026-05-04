@@ -31,6 +31,7 @@ class TestCase:
     to_version: str
     update_type: str
     notes: str = ""
+    expected_facts: list = None
 
 @dataclass
 class AgentResult:
@@ -56,6 +57,8 @@ class EvaluationScore:
     has_migration_steps: bool
     overall_score: float
     judge_reasoning: str = ""
+    fact_coverage_score: float = 0.0
+    fabricated_details: bool = False
 
 @dataclass
 class BenchmarkConfig:
@@ -192,6 +195,9 @@ JUDGE_PROMPT = """Je bent een expert software engineer die een AI-gegenereerde d
 - Naar versie: {to_version}
 - Type: {update_type} update
 
+## Verwachte feiten (grondwaarheid uit de officiële changelog)
+{expected_facts}
+
 ## Output van de AI agent
 {output}
 
@@ -203,6 +209,8 @@ Beoordeel op de volgende criteria (schaal 0-10). Geef JE antwoord ALLEEN als JSO
   "specificity": <0-10, bevat de analyse concrete package-specifieke info of is het vaag/generiek?>,
   "completeness": <0-10, zijn de verwachte secties aanwezig: New Features, Breaking Changes, Migration Steps, Safe to update?>,
   "actionability": <0-10, kan een developer op basis hiervan beslissen of hij update zonder de changelog te lezen?>,
+  "fact_coverage": <0-10, hoeveel van de verwachte feiten worden correct en volledig vermeld?>,
+  "fabricated_details": <true/false, noemt de agent specifieke details die niet in de verwachte feiten staan en niet verifieerbaar zijn?>,
   "safety_verdict": "<kopieer de exacte Safe to update waarde: Yes / No / With caution / Not found>",
   "has_breaking_changes_section": <true/false>,
   "has_migration_steps_section": <true/false>,
@@ -210,11 +218,17 @@ Beoordeel op de volgende criteria (schaal 0-10). Geef JE antwoord ALLEEN als JSO
 }}"""
 
 async def evaluate_output(client, tc, output, judge_model):
+    # Formatteer de expected_facts als een genummerde lijst
+    facts_text = "\n".join(
+        f"- {fact}" for fact in (tc.expected_facts or [])
+    ) or "Geen verwachte feiten opgegeven."
+
     prompt = JUDGE_PROMPT.format(
         package_name=tc.package_name,
         from_version=tc.from_version,
         to_version=tc.to_version,
         update_type=tc.update_type,
+        expected_facts=facts_text,
         output=output[:4000],
     )
 
@@ -234,10 +248,20 @@ async def evaluate_output(client, tc, output, judge_model):
         if text.startswith("json"):
             text = text[4:]
     data = json.loads(text)
+
     specificity = float(data["specificity"])
     completeness = float(data["completeness"])
     actionability = float(data["actionability"])
-    overall = (actionability * 0.45) + (specificity * 0.35) + (completeness * 0.2)
+    fact_coverage = float(data.get("fact_coverage", 0))
+
+    # Nieuwe gewichten: actionability 40%, specificity 30%, completeness 15%, fact_coverage 15%
+    overall = (
+        (actionability  * 0.40) +
+        (specificity    * 0.30) +
+        (completeness   * 0.15) +
+        (fact_coverage  * 0.15)
+    )
+
     return EvaluationScore(
         agent_name="",
         test_id=tc.id,
@@ -250,6 +274,8 @@ async def evaluate_output(client, tc, output, judge_model):
         has_migration_steps=bool(data.get("has_migration_steps_section", False)),
         overall_score=overall,
         judge_reasoning=data.get("reasoning", ""),
+        fact_coverage_score=fact_coverage,
+        fabricated_details=bool(data.get("fabricated_details", False)),
     )
 
 # ─────────────────────────────────────────────
@@ -368,6 +394,7 @@ def load_config(path):
             to_version=p["to_version"],
             update_type=p.get("update_type", "unknown"),
             notes=p.get("notes", ""),
+            expected_facts=p.get("expected_facts", []),
         )
         for p in raw["test_prompts"]
     ]
