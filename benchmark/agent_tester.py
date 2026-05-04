@@ -32,6 +32,7 @@ class TestCase:
     update_type: str
     notes: str = ""
     expected_facts: list = None
+    changelog_source: str = ""
 
 @dataclass
 class AgentResult:
@@ -395,6 +396,7 @@ def load_config(path):
             update_type=p.get("update_type", "unknown"),
             notes=p.get("notes", ""),
             expected_facts=p.get("expected_facts", []),
+            changelog_source=p.get("changelog_source", ""),
         )
         for p in raw["test_prompts"]
     ]
@@ -432,6 +434,8 @@ async def main():
                 "update_type": r.test_case.update_type,
                 "output": r.output, "latency_ms": r.latency_ms,
                 "tokens": r.tokens_used, "error": r.error, "run": r.run_index,
+                "expected_facts": r.test_case.expected_facts or [],
+                "changelog_source": r.test_case.changelog_source,
             }
             for r in results
         ],
