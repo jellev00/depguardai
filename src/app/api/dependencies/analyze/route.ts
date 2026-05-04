@@ -4,6 +4,11 @@ import { NextResponse } from "next/server";
 const MASTRA_BASE_URL = "http://localhost:4111";
 const N8N_BASE_URL = "http://localhost:5678";
 
+import {
+  analyzeDependency,
+  isOpenAIAgentAvailable,
+} from "@/src/openai-agent/agents/dependency-agent";
+
 /** 
  * Checks if a service is reachable by sending a quick HEAD/GET request.
  * Returns true if the service responds withi the timeout, false otherwise.
@@ -38,6 +43,7 @@ export async function POST(request: Request) {
       isServiceAvailable(MASTRA_BASE_URL),
       isServiceAvailable(N8N_BASE_URL),
     ]);
+    const openAiAvailable = isOpenAIAgentAvailable();
 
     console.log(`Service availability - Mastra: ${mastraAvailable}, n8n: ${n8nAvailable}`);
 
@@ -73,7 +79,7 @@ export async function POST(request: Request) {
     } else if (n8nAvailable) {
       // --- n8n ---
       const n8nRes = await fetch(
-        `${N8N_BASE_URL}/webhook-test/analyze-dependency`,
+        `${N8N_BASE_URL}/webhook/analyze-dependency`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,6 +99,12 @@ export async function POST(request: Request) {
       const n8nData = await n8nRes.json();
       summary = n8nData.summary;
 
+    } else if (openAiAvailable) {
+      summary = await analyzeDependency({
+        name,
+        currentVersion,
+        latestVersion,
+      })
     } else {
       // Niether service is available
       throw new Error("No analysis service is currently available. Both Mastra and n8n are offline.");

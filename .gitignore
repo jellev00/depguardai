@@ -36,3 +36,8 @@ node_modules/
 .mastra/
 .env*.local
 .DS_Store
+
+# AI agent tester
+benchmark/.env
+benchmark/results/
+benchmark/__pycache__/

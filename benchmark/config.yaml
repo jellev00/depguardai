@@ -1,0 +1,115 @@
+runs_per_prompt: 3
+judge_model: "gpt-4o-mini"
+output_dir: "results"
+
+agents:
+  - name: "Mastra"
+    type: mastra
+    endpoint: "http://localhost:4111/api/agents/dependencyAgent/generate"
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+  - name: "n8n"
+    type: n8n
+    endpoint: "http://localhost:5678/webhook/analyze-dependency"
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+  - name: "OpenAI"
+    type: openai
+    api_key: ""
+    model: "gpt-4o-mini"
+    cost_per_1k_tokens: 0.005
+
+test_prompts:
+  - id: "react_minor"
+    package_name: "react"
+    from_version: "18.2.0"
+    to_version: "18.3.0"
+    update_type: minor
+    notes: "Kleine minor update"
+    changelog_source: "https://github.com/facebook/react/blob/main/CHANGELOG.md#1830-may-22-2023"
+    expected_facts:
+      - "18.3.0 is functionally identical to 18.2.0 — no new features added"
+      - "The release only adds deprecation warnings for APIs that will be removed in React 19"
+      - "ReactDOM.render is deprecated — replace with ReactDOM.createRoot"
+      - "ReactDOM.hydrate is deprecated — replace with ReactDOM.hydrateRoot"
+      - "ReactDOM.unmountComponentAtNode is deprecated — replace with root.unmount()"
+      - "String refs in class components get stricter warning — use createRef()"
+      - "defaultProps on function components is deprecated (new warning in 18.3.0)"
+      - "No breaking changes in this release"
+      - "Safe to update: Yes — drop-in replacement, only new console warnings"
+
+  - id: "nextjs_minor"
+    package_name: "next"
+    from_version: "14.1.0"
+    to_version: "14.2.0"
+    update_type: minor
+    notes: "Next.js minor — heeft eigen changelog site"
+    changelog_source: "https://nextjs.org/blog/next-14-2"
+    expected_facts:
+      - "Turbopack stability and performance improvements for the dev server (more stable for large applications)"
+      - "New error overlay with light/dark mode for both App Router and Pages Router"
+      - "Improved hydration error messages showing source code of the mismatch (shows exact location)"
+      - "New experimental staleTimes config option for Client-side Router Cache"
+      - "Production build memory usage drastically reduced: from ~2.2GB to under 190MB on average"
+      - "New --experimental-debug-memory-usage flag for next build"
+      - "CSS chunking improved to avoid conflicting styles during navigation"
+      - "No breaking changes"
+      - "Safe to update: Yes — stable release with only improvements"
+
+  - id: "typescript_major"
+    package_name: "typescript"
+    from_version: "4.9.5"
+    to_version: "5.0.4"
+    update_type: major
+    notes: "Major versie — mogelijk breaking changes"
+    changelog_source: "https://devblogs.microsoft.com/typescript/announcing-typescript-5-0/"
+    expected_facts:
+      - "New ECMAScript Stage 3 decorators (without experimentalDecorators flag) — different API structure than legacy decorators"
+      - "Legacy decorator libraries (NestJS, TypeORM, Angular) do NOT work with new decorators without keeping experimentalDecorators: true"
+      - "New const modifier on type parameters for const-like type inference"
+      - "Const enums that are fully constant are now treated as union enums"
+      - "New moduleResolution: bundler option for better compatibility with modern bundlers"
+      - "Package size ~41% smaller: from 63.8MB to ~37.4MB"
+      - "Minimum Node.js version is now 14.17 (official), with 12.20 as absolute minimum"
+      - "ECMAScript target minimum is now ES2018"
+      - "Breaking: relational operators (> < >= <=) between string and number now produce a type error"
+      - "Deprecated tsconfig options (warning until TS 5.5, then error): target ES3, out, noImplicitUseStrict, keyofStringsOnly, suppressExcessPropertyErrors, suppressImplicitAnyIndexErrors, noStrictGenericChecks, charset, importsNotUsedAsValues, preserveValueImports"
+      - "Internal compiler API breaking changes: isTypeAssertion removed, various factory function overloads removed"
+      - "Safe to update: With caution — check decorator usage and deprecated tsconfig options"
+
+  - id: "zod_patch"
+    package_name: "zod"
+    from_version: "3.22.3"
+    to_version: "3.22.4"
+    update_type: patch
+    notes: "Kleine patch — verwacht bugfixes"
+    changelog_source: "https://github.com/colinhacks/zod/releases/tag/v3.22.4"
+    expected_facts:
+      - "Patch release within the 3.22.x line — no new features, no breaking changes"
+      - "The official Zod changelog does not publish detailed notes for individual patch releases within a minor"
+      - "An agent that mentions SPECIFIC bug fixes for 3.22.4 without a source is likely fabricating details"
+      - "Safe to update: Yes — patch releases in Zod 3.22.x are safe"
+      - "Context: Zod 3.22.4 is the last stable 3.22.x version"
+
+  - id: "tailwind_minor"
+    package_name: "tailwindcss"
+    from_version: "3.3.0"
+    to_version: "3.4.0"
+    update_type: minor
+    notes: "Tailwind heeft eigen docs site"
+    changelog_source: "https://github.com/tailwindlabs/tailwindcss/releases/tag/v3.4.0"
+    expected_facts:
+      - "Dynamic viewport units: dvh, lvh, svh, dvw, lvw, svw classes (work correctly on mobile, address 100vh problems)"
+      - "New :has() variant: has-[...] to style parent elements based on their children (CSS :has() polyfill)"
+      - "New * variant: style direct children with *:class syntax"
+      - "New size-* utilities: set width and height simultaneously (e.g., size-4 = w-4 h-4)"
+      - "New text-wrap utilities: text-balance and text-pretty for better headline wrapping"
+      - "Subgrid support: grid-cols-subgrid and grid-rows-subgrid"
+      - "Extended opacity scale with steps of 5 (from 0 to 100 in steps of 5)"
+      - "New forced-colors variant for forced colors mode (accessibility)"
+      - "Grid rows extended from 6 to 12"
+      - "New 3D transform utilities: rotate-x, rotate-y, etc."
+      - "No breaking changes"
+      - "Safe to update: Yes — fully backwards compatible"
